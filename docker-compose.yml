@@ -1,0 +1,24 @@
+# Basic Docker Compose for running DB
+
+version: '3'
+
+services:
+  startup-postgres-db:
+      # PostgreSQL system DB
+      build: ./docker/postgres
+      image: 'postgres:startup'
+      container_name: startup-postgres-db
+      ports:
+        - "0.0.0.0:5432:5432"
+      environment:
+        - POSTGRES_PASSWORD=pgpassword
+        - POSTGRES_USER=sys-user
+        - POSTGRES_DB=startup
+  startup-localstack:
+    container_name: 'startup-localstack'
+    image: localstack/localstack:0.11.6
+    ports:
+      - "4566-4599:4566-4599"
+      - '8055:8055'
+    environment:
+      - SERVICES=s3,sts

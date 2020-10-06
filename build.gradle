@@ -1,0 +1,74 @@
+import com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat
+plugins {
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+	id 'com.avast.gradle.docker-compose' version '0.7.1'
+	id 'com.github.sherter.google-java-format' version '0.8'
+}
+
+group = 'net.jk.app'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "Hoxton.SR8")
+}
+
+task format(type: GoogleJavaFormat) {
+        source 'src/main'
+        source 'src/test'
+        source 'src/integTest'
+        include '**/*.java'
+    }
+
+dependencies {
+	// Spring
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-jersey'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// Tools
+	implementation 'org.liquibase:liquibase-core'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.apache.commons:commons-lang3:3.11'
+	
+	
+	// AWS
+	implementation 'com.amazonaws:aws-java-sdk-core:1.11.874'
+	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.874'
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.874'
+	
+	
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+dockerCompose {
+    useComposeFiles = ['docker-compose.yml']
+}
+
+test {
+	useJUnitPlatform()
+}
